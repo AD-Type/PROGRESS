@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROGRESS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --bg-color: #0b0b0b;
+            --panel-bg: #111111;
+            --border-color: #222222;
+            --text-primary: #ffffff;
+            --text-muted: #888888;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+            letter-spacing: 1.5px;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .crt::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 99999;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080808;
+            border-left: 1px solid #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444444;
+        }
+
+        .scanline-sweep {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanline-sweep::after {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.03), transparent);
+            animation: sweep 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes sweep {
+            0% { top: -100%; }
+            100% { top: 200%; }
+        }
+    </style>
+</head>
+<body class="crt min-h-screen flex flex-col justify-between selection:bg-white selection:text-black">
+
+    <header class="border-b border-[#222222] bg-[#0b0b0b] sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-6">
+                <button id="nav-home-btn" class="text-lg md:text-xl font-bold tracking-widest text-white hover:text-gray-300 transition uppercase text-left flex items-center space-x-2 group">
+                    <span class="text-gray-600 group-hover:text-white transition">></span>
+                    <span>PROGRESS</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-16 flex flex-col justify-center scanline-sweep">
+        
+        <div id="trackers-view" class="space-y-6">
+            <div class="flex justify-between items-center mb-6 px-2 border-b border-[#1f1f1f] pb-3">
+                <div class="flex items-center space-x-2 text-xs text-gray-400 uppercase tracking-widest">
+                    <span class="text-gray-600">#</span>
+                    <span>PROGRESS_METRICS.LOG</span>
+                </div>
+            </div>
+
+            <div id="trackers-container" class="space-y-6 my-4 bg-[#0e0e0e] border border-[#1c1c1c] p-6 shadow-inner">
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="py-4 text-center text-xs text-gray-600 border-t border-[#1a1a1a] bg-[#0b0b0b] font-mono">
+    </footer>
+
+    <script>
+        const appConfig = {
+            totalBlocks: 10,
+            rows: [
+                { id: 1, label: "VOICELINES", progress: 100 },
+                { id: 2, label: "FOOTAGE", progress: 20 },
+                { id: 3, label: "MUSIC", progress: 70 }
+            ]
+        };
+
+        function initApp() {
+            renderTrackers();
+        }
+
+        function renderTrackers() {
+            const container = document.getElementById('trackers-container');
+            container.innerHTML = '';
+
+            appConfig.rows.forEach((row) => {
+                const filledCount = Math.round((row.progress / 100) * appConfig.totalBlocks);
+                const emptyCount = appConfig.totalBlocks - filledCount;
+                const filledBlocks = '■'.repeat(filledCount);
+                const emptyBlocks = '□'.repeat(emptyCount);
+
+                const rowEl = document.createElement('div');
+                rowEl.className = "flex flex-col sm:flex-row sm:items-center justify-between py-3 px-3 border-b border-[#181818] last:border-0";
+                rowEl.innerHTML = `
+                    <div class="flex items-center space-x-4 mb-2 sm:mb-0">
+                        <span class="text-sm text-gray-300 font-mono tracking-wider">${row.label}</span>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end space-x-6">
+                        <div class="text-xl sm:text-2xl tracking-widest font-mono whitespace-nowrap select-none">
+                            <span class="text-white">${filledBlocks}</span><span class="text-gray-600">${emptyBlocks}</span>
+                        </div>
+                        <span class="text-xs text-gray-500 font-mono w-12 text-right bg-[#141414] px-2 py-1 border border-[#222222]">${row.progress}%</span>
+                    </div>
+                `;
+                container.appendChild(rowEl);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
