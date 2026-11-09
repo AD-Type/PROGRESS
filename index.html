@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROGRESS</title>
+    <title>PROGRESS // TERMINAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
         :root {
             --bg-color: #0b0b0b;
-            --panel-bg: #111111;
-            --border-color: #222222;
+            --panel-bg: #0e0e0e;
+            --border-color: #1c1c1c;
+            --border-subtle: #181818;
             --text-primary: #ffffff;
-            --text-muted: #888888;
+            --text-muted: #666666;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-primary);
             font-family: 'Share Tech Mono', monospace;
-            font-size: 18px;
+            font-size: 16px;
             letter-spacing: 1.5px;
             margin: 0;
             padding: 0;
@@ -40,15 +40,13 @@
         }
 
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #080808;
-            border-left: 1px solid #1a1a1a;
         }
         ::-webkit-scrollbar-thumb {
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
+            background: #222222;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #444444;
@@ -65,7 +63,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.03), transparent);
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.02), transparent);
             animation: sweep 8s linear infinite;
             pointer-events: none;
         }
@@ -74,38 +72,119 @@
             0% { top: -100%; }
             100% { top: 200%; }
         }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #1c1c1c;
+            border: 1px solid #333333;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 12px;
+            width: 8px;
+            background: #ffffff;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -5px;
+        }
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #1c1c1c;
+            border: 1px solid #333333;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 12px;
+            width: 8px;
+            background: #ffffff;
+            cursor: pointer;
+            border: none;
+        }
     </style>
 </head>
 <body class="crt min-h-screen flex flex-col justify-between selection:bg-white selection:text-black">
 
-    <header class="border-b border-[#222222] bg-[#0b0b0b] sticky top-0 z-50 shadow-md">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-6">
-                <button id="nav-home-btn" class="text-lg md:text-xl font-bold tracking-widest text-white hover:text-gray-300 transition uppercase text-left flex items-center space-x-2 group">
-                    <span class="text-gray-600 group-hover:text-white transition">></span>
-                    <span>PROGRESS</span>
+    <header class="border-b border-[#1c1c1c] bg-[#0b0b0b] sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+            <button onclick="switchView('trackers')" class="text-base font-bold tracking-widest text-white hover:text-gray-400 transition uppercase flex items-center space-x-2">
+                <span class="text-gray-600">></span>
+                <span>PROGRESS</span>
+            </button>
+            
+            <div class="flex items-center space-x-3 text-xs font-mono">
+                <button id="btn-view-trackers" onclick="switchView('trackers')" class="px-3 py-1 border border-white bg-white text-black font-bold uppercase transition">
+                    PROGRESS
+                </button>
+                <button id="btn-view-audio" onclick="switchView('audio')" class="px-3 py-1 border border-[#222222] text-gray-500 hover:text-white hover:border-gray-600 transition uppercase">
+                    AUDIO LOGS
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-16 flex flex-col justify-center scanline-sweep">
+    <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 flex flex-col justify-center scanline-sweep">
         
         <div id="trackers-view" class="space-y-6">
-            <div class="flex justify-between items-center mb-6 px-2 border-b border-[#1f1f1f] pb-3">
-                <div class="flex items-center space-x-2 text-xs text-gray-400 uppercase tracking-widest">
-                    <span class="text-gray-600">#</span>
+            <div class="flex justify-between items-center mb-4 border-b border-[#181818] pb-3">
+                <div class="text-xs text-gray-500 uppercase tracking-widest flex items-center space-x-2">
+                    <span class="text-gray-700">#</span>
                     <span>PROGRESS_METRICS.LOG</span>
                 </div>
             </div>
 
-            <div id="trackers-container" class="space-y-6 my-4 bg-[#0e0e0e] border border-[#1c1c1c] p-6 shadow-inner">
+            <div id="trackers-container" class="bg-[#0e0e0e] border border-[#1c1c1c] p-6 space-y-4">
+            </div>
+        </div>
+
+        <div id="audio-view" class="space-y-6 hidden">
+            <div class="flex justify-between items-center mb-4 border-b border-[#181818] pb-3">
+                <div class="text-xs text-gray-500 uppercase tracking-widest flex items-center space-x-2">
+                    <span class="text-gray-700">#</span>
+                    <span>AUDIO_RECORDINGS.LOG</span>
+                </div>
+            </div>
+
+            <div class="bg-[#0e0e0e] border border-[#1c1c1c] p-6 space-y-4">
+                <div class="flex flex-col space-y-3 py-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-5">
+                            <span id="play-symbol" onclick="toggleAudio()" class="cursor-pointer text-white hover:text-gray-400 text-lg transition select-none">
+                                &#9654;
+                            </span>
+                            <span class="text-sm font-mono text-white tracking-wider">VOICELINE_01_INTRO.WAV</span>
+                        </div>
+                        <span id="time-display" class="text-xs text-gray-500 font-mono w-28 text-right bg-[#121212] px-2 py-1 border border-[#222222]">00:00 / 00:45</span>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-2">
+                        <input type="range" id="audio-slider" min="0" max="45" value="0" step="0.1" class="w-full cursor-pointer" oninput="onSliderSeek(this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 flex justify-start">
+                <button onclick="switchView('trackers')" class="text-xs border border-[#222222] hover:border-white px-4 py-2 bg-[#0e0e0e] text-gray-400 hover:text-white transition uppercase font-mono tracking-widest">
+                    &lt; BACK TO PROGRESS
+                </button>
             </div>
         </div>
 
     </main>
 
-    <footer class="py-4 text-center text-xs text-gray-600 border-t border-[#1a1a1a] bg-[#0b0b0b] font-mono">
+    <footer class="py-4 border-t border-[#181818] bg-[#0b0b0b]">
+        <div class="max-w-4xl mx-auto px-6 flex justify-between items-center text-xs text-gray-700 font-mono">
+            <span>SYS_STATUS: ONLINE</span>
+            <span>BUILD: 2.1.0</span>
+        </div>
     </footer>
 
     <script>
@@ -118,8 +197,39 @@
             ]
         };
 
+        let currentView = 'trackers';
+        let isPlaying = false;
+        let audioContext = null;
+        let oscillator = null;
+        let gainNode = null;
+        let currentTime = 0;
+        const totalDuration = 45;
+        let playbackInterval = null;
+
         function initApp() {
             renderTrackers();
+        }
+
+        function switchView(viewName) {
+            currentView = viewName;
+            const trackersView = document.getElementById('trackers-view');
+            const audioView = document.getElementById('audio-view');
+            const btnTrackers = document.getElementById('btn-view-trackers');
+            const btnAudio = document.getElementById('btn-view-audio');
+
+            if (viewName === 'trackers') {
+                audioView.classList.add('hidden');
+                trackersView.classList.remove('hidden');
+
+                btnTrackers.className = "px-3 py-1 border border-white bg-white text-black font-bold uppercase transition";
+                btnAudio.className = "px-3 py-1 border border-[#222222] text-gray-500 hover:text-white hover:border-gray-600 transition uppercase";
+            } else {
+                trackersView.classList.add('hidden');
+                audioView.classList.remove('hidden');
+
+                btnAudio.className = "px-3 py-1 border border-white bg-white text-black font-bold uppercase transition";
+                btnTrackers.className = "px-3 py-1 border border-[#222222] text-gray-500 hover:text-white hover:border-gray-600 transition uppercase";
+            }
         }
 
         function renderTrackers() {
@@ -133,20 +243,99 @@
                 const emptyBlocks = '□'.repeat(emptyCount);
 
                 const rowEl = document.createElement('div');
-                rowEl.className = "flex flex-col sm:flex-row sm:items-center justify-between py-3 px-3 border-b border-[#181818] last:border-0";
+                rowEl.className = "flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-[#181818] last:border-0";
                 rowEl.innerHTML = `
-                    <div class="flex items-center space-x-4 mb-2 sm:mb-0">
-                        <span class="text-sm text-gray-300 font-mono tracking-wider">${row.label}</span>
+                    <div class="mb-2 sm:mb-0">
+                        <span class="text-xs text-gray-300 font-mono tracking-wider">${row.label}</span>
                     </div>
                     <div class="flex items-center justify-between sm:justify-end space-x-6">
-                        <div class="text-xl sm:text-2xl tracking-widest font-mono whitespace-nowrap select-none">
-                            <span class="text-white">${filledBlocks}</span><span class="text-gray-600">${emptyBlocks}</span>
+                        <div class="text-lg sm:text-xl tracking-widest font-mono whitespace-nowrap select-none">
+                            <span class="text-white">${filledBlocks}</span><span class="text-gray-700">${emptyBlocks}</span>
                         </div>
-                        <span class="text-xs text-gray-500 font-mono w-12 text-right bg-[#141414] px-2 py-1 border border-[#222222]">${row.progress}%</span>
+                        <span class="text-xs text-gray-500 font-mono w-12 text-right bg-[#121212] px-2 py-1 border border-[#222222]">${row.progress}%</span>
                     </div>
                 `;
                 container.appendChild(rowEl);
             });
+        }
+
+        function toggleAudio() {
+            if (isPlaying) {
+                stopSynth();
+            } else {
+                startSynth();
+            }
+        }
+
+        function startSynth() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            oscillator = audioContext.createOscillator();
+            gainNode = audioContext.createGain();
+
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(140 + (currentTime * 4 % 100), audioContext.currentTime);
+
+            gainNode.gain.setValueAtTime(0.04, audioContext.currentTime);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            isPlaying = true;
+            document.getElementById('play-symbol').innerHTML = '&#9632;';
+
+            playbackInterval = setInterval(() => {
+                currentTime += 0.1;
+                if (currentTime >= totalDuration) {
+                    currentTime = 0;
+                    stopSynth();
+                    updateTimeDisplay();
+                    return;
+                }
+                if (oscillator) {
+                    oscillator.frequency.setValueAtTime(140 + (currentTime * 4 % 100), audioContext.currentTime);
+                }
+                updateTimeDisplay();
+            }, 100);
+        }
+
+        function stopSynth() {
+            if (oscillator) {
+                oscillator.stop();
+                oscillator.disconnect();
+                oscillator = null;
+            }
+            if (playbackInterval) {
+                clearInterval(playbackInterval);
+                playbackInterval = null;
+            }
+            isPlaying = false;
+            document.getElementById('play-symbol').innerHTML = '&#9654;';
+        }
+
+        function onSliderSeek(value) {
+            currentTime = parseFloat(value);
+            updateTimeDisplay();
+            if (isPlaying && oscillator && audioContext) {
+                oscillator.frequency.setValueAtTime(140 + (currentTime * 4 % 100), audioContext.currentTime);
+            }
+        }
+
+        function updateTimeDisplay() {
+            const slider = document.getElementById('audio-slider');
+            const display = document.getElementById('time-display');
+            
+            slider.value = currentTime;
+
+            const curSec = Math.floor(currentTime);
+            const curStr = curSec < 10 ? '0' + curSec : curSec;
+            display.innerText = `00:${curStr} / 00:${totalDuration}`;
         }
 
         window.addEventListener('DOMContentLoaded', initApp);
