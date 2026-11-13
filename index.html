@@ -153,6 +153,20 @@
         </div>
 
         <audio id="main-audio" src="contact.mp3" preload="metadata"></audio>
+             <div class="bg-[#0e0e0e] border border-[#1c1c1c] p-6 shadow-inner">
+                <div class="flex flex-col md:flex-row md:items-center justify-between py-3 px-3 border-b border-[#181818] gap-4">
+                    <span id="audio-title-display" class="text-sm text-gray-300 font-mono tracking-wider">FIRST CONTACT SINCE [REDACTED]</span>
+                    
+                    <div class="flex items-center space-x-4">
+                        <button id="play-btn" onclick="toggleAudio()" class="text-white hover:text-gray-400 transition font-mono text-lg select-none">▶</button>
+                        <input type="range" id="audio-slider" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)" class="w-32 md:w-48">
+                        <span id="time-display" class="text-xs text-gray-500 font-mono w-28 text-right">00:00 / 00:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <audio id="main-audio" src="contact.mp3" preload="metadata"></audio>
 
     </main>
 
