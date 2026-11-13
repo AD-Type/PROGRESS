@@ -139,34 +139,9 @@
                 </button>
             </div>
 
-            <div class="bg-[#0e0e0e] border border-[#1c1c1c] p-6 shadow-inner">
-                <div class="flex flex-col md:flex-row md:items-center justify-between py-3 px-3 border-b border-[#181818] gap-4">
-                    <span id="audio-title-display" class="text-sm text-gray-300 font-mono tracking-wider">FIRST CONTACT SINCE [REDACTED]</span>
-                    
-                    <div class="flex items-center space-x-4">
-                        <button id="play-btn" onclick="toggleAudio()" class="text-white hover:text-gray-400 transition font-mono text-lg select-none">▶</button>
-                        <input type="range" id="audio-slider" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)" class="w-32 md:w-48">
-                        <span id="time-display" class="text-xs text-gray-500 font-mono w-28 text-right">00:00 / 00:00</span>
-                    </div>
-                </div>
+            <div id="audio-container" class="bg-[#0e0e0e] border border-[#1c1c1c] p-6 shadow-inner space-y-2">
             </div>
         </div>
-
-        <audio id="main-audio" src="contact.mp3" preload="metadata"></audio>
-             <div class="bg-[#0e0e0e] border border-[#1c1c1c] p-6 shadow-inner">
-                <div class="flex flex-col md:flex-row md:items-center justify-between py-3 px-3 border-b border-[#181818] gap-4">
-                    <span id="audio-title-display" class="text-sm text-gray-300 font-mono tracking-wider">FIRST CONTACT SINCE [REDACTED]</span>
-                    
-                    <div class="flex items-center space-x-4">
-                        <button id="play-btn" onclick="toggleAudio()" class="text-white hover:text-gray-400 transition font-mono text-lg select-none">▶</button>
-                        <input type="range" id="audio-slider" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)" class="w-32 md:w-48">
-                        <span id="time-display" class="text-xs text-gray-500 font-mono w-28 text-right">00:00 / 00:00</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <audio id="main-audio" src="contact.mp3" preload="metadata"></audio>
 
     </main>
 
@@ -178,19 +153,20 @@
             totalBlocks: 10,
             rows: [
                 { id: 1, label: "VOICELINES", progress: 60 },
-                { id: 2, label: "FOOTAGE", progress: 32 },
+                { id: 2, label: "FOOTAGE", progress: 35 },
                 { id: 3, label: "MUSIC", progress: 80 }
+            ],
+            audioLogs: [
+                { title: "FIRST CONTACT SINCE [REDACTED]", src: "contact.mp3" },
+                { title: "Questions", src: "Questions.mp3" }
             ]
         };
 
-        const audio = document.getElementById('main-audio');
-        const playBtn = document.getElementById('play-btn');
-        const slider = document.getElementById('audio-slider');
-        const timeDisplay = document.getElementById('time-display');
+        const audioPlayers = [];
 
         function initApp() {
             renderTrackers();
-            setupAudioListeners();
+            renderAudioLogs();
         }
 
         function renderTrackers() {
@@ -220,6 +196,82 @@
             });
         }
 
+        function renderAudioLogs() {
+            const container = document.getElementById('audio-container');
+            container.innerHTML = '';
+
+            appConfig.audioLogs.forEach((log, index) => {
+                const audio = new Audio(log.src);
+                audio.preload = 'metadata';
+                audioPlayers.push(audio);
+
+                const rowEl = document.createElement('div');
+                rowEl.className = "flex flex-col md:flex-row md:items-center justify-between py-3 px-3 border-b border-[#181818] last:border-0 gap-4";
+                rowEl.innerHTML = `
+                    <span class="text-sm text-gray-300 font-mono tracking-wider">${log.title}</span>
+                    <div class="flex items-center space-x-4">
+                        <button id="play-btn-${index}" onclick="toggleAudio(${index})" class="text-white hover:text-gray-400 transition font-mono text-lg select-none">▶</button>
+                        <input type="range" id="slider-${index}" min="0" max="100" value="0" step="0.1" oninput="seekAudio(${index}, this.value)" class="w-32 md:w-48">
+                        <span id="time-${index}" class="text-xs text-gray-500 font-mono w-28 text-right">00:00 / 00:00</span>
+                    </div>
+                `;
+                container.appendChild(rowEl);
+
+                audio.addEventListener('loadedmetadata', () => updateTimeDisplay(index));
+                audio.addEventListener('timeupdate', () => {
+                    if (audio.duration) {
+                        document.getElementById(`slider-${index}`).value = (audio.currentTime / audio.duration) * 100;
+                        updateTimeDisplay(index);
+                    }
+                });
+                audio.addEventListener('ended', () => {
+                    document.getElementById(`play-btn-${index}`).textContent = '▶';
+                    document.getElementById(`slider-${index}`).value = 0;
+                    audio.currentTime = 0;
+                });
+            });
+        }
+
+        function toggleAudio(index) {
+            const currentAudio = audioPlayers[index];
+            const currentBtn = document.getElementById(`play-btn-${index}`);
+
+            audioPlayers.forEach((audio, i) => {
+                if (i !== index && !audio.paused) {
+                    audio.pause();
+                    document.getElementById(`play-btn-${i}`).textContent = '▶';
+                }
+            });
+
+            if (currentAudio.paused) {
+                currentAudio.play();
+                currentBtn.textContent = '■';
+            } else {
+                currentAudio.pause();
+                currentBtn.textContent = '▶';
+            }
+        }
+
+        function seekAudio(index, val) {
+            const audio = audioPlayers[index];
+            if (audio.duration) {
+                audio.currentTime = (val / 100) * audio.duration;
+                updateTimeDisplay(index);
+            }
+        }
+
+        function updateTimeDisplay(index) {
+            const audio = audioPlayers[index];
+            document.getElementById(`time-${index}`).textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
         function showView(view) {
             const trackersView = document.getElementById('trackers-view');
             const audioView = document.getElementById('audio-view');
@@ -231,55 +283,6 @@
                 trackersView.classList.add('hidden');
                 audioView.classList.remove('hidden');
             }
-        }
-
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return "00:00";
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function setupAudioListeners() {
-            audio.addEventListener('loadedmetadata', () => {
-                updateTimeDisplay();
-            });
-
-            audio.addEventListener('timeupdate', () => {
-                if (audio.duration) {
-                    slider.value = (audio.currentTime / audio.duration) * 100;
-                    updateTimeDisplay();
-                }
-            });
-
-            audio.addEventListener('ended', () => {
-                playBtn.textContent = '▶';
-                slider.value = 0;
-                audio.currentTime = 0;
-            });
-        }
-
-        function toggleAudio() {
-            if (audio.paused) {
-                audio.play();
-                playBtn.textContent = '■';
-            } else {
-                audio.pause();
-                playBtn.textContent = '▶';
-            }
-        }
-
-        function seekAudio(val) {
-            if (audio.duration) {
-                audio.currentTime = (val / 100) * audio.duration;
-                updateTimeDisplay();
-            }
-        }
-
-        function updateTimeDisplay() {
-            const current = formatTime(audio.currentTime);
-            const duration = formatTime(audio.duration);
-            timeDisplay.textContent = `${current} / ${duration}`;
         }
 
         window.addEventListener('DOMContentLoaded', initApp);
